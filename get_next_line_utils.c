@@ -23,7 +23,8 @@ char	*ft_strchr(const char *s, int c)
 	return (NULL);
 }
 
-char *ft_strdup(const char *s) {
+char *ft_strdup(const char *s)
+{
     char *dup;
     size_t i;
 
@@ -39,30 +40,31 @@ char *ft_strdup(const char *s) {
     return (dup);
 }
 
-char *ft_strjoin_free(char **s1, char **s2)
+char *ft_strjoin_and_free(char *s1, char *s2)
 {
-    char *r;
-    size_t i,
-	size_t j;
+    char *new_str;
+    size_t i, j;
 
-    if (!s1 || !s2 || !*s1 || !*s2)
+    new_str = malloc(sizeof(char) * (ft_strlen(s1) + ft_strlen(s2) + 1));
+    if (!new_str)
+    {
+        free(s1);  // Free the old string to prevent leaks
         return (NULL);
-    r = malloc(sizeof(char) * (ft_strlen(*s1) + ft_strlen(*s2) + 1));
-    if (!r)
-        return (NULL);
+    }
     i = -1;
-    while ((*s1)[++i] != '\0')
-        r[i] = (*s1)[i];
-    j = -1;
-    while ((*s2)[++j] != '\0')
-        r[i + j] = (*s2)[j];
-    r[i + j] = '\0';
-    free(*s1);
-    free(*s2);
-    return (r);
+    j = 0;
+    while (s1[++i] != '\0')
+        new_str[j++] = s1[i];
+    i = -1;
+    while (s2[++i] != '\0')
+        new_str[j++] = s2[i];
+    new_str[j] = '\0';
+    free(s1);  // Free the old string after copying
+    return (new_str);
 }
 
-char *ft_substr(char const *s, unsigned int start, size_t len) {
+char *ft_substr(char const *s, unsigned int start, size_t len)
+{
     char    *substr;
     size_t  i;
     size_t  s_len;
@@ -71,14 +73,15 @@ char *ft_substr(char const *s, unsigned int start, size_t len) {
         return (NULL);
     s_len = ft_strlen(s);
     if (start >= s_len)
-        return (malloc(sizeof(char)));
+        return (malloc(sizeof(char) * 2));
     if (len > s_len - start)
         len = s_len - start;
     substr = (char *)malloc(sizeof(char) * (len + 1));
     if (!substr)
         return (NULL);
     i = 0;
-    while (i < len) {
+    while (i < len)
+    {
         substr[i] = s[start + i];
         i++;
     }
