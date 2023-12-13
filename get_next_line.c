@@ -1,113 +1,122 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   get_next_line.c                                    :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: olobresh <olobresh@student.42berlin.d      +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2023/12/08 13:31:08 by olobresh          #+#    #+#             */
+/*   Updated: 2023/12/12 19:30:22 by olobresh         ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 #include "get_next_line.h"
 
-// Reads and buffers data from file descriptor.
-static int buffer_data(int fd, char **buffered_text, char *temp_storage)
+static int	buffer_data(int fd, char **buff_txt, char *tmp_stor)
 {
-    char *merged_text;
-    int read_chars;
-    int i;
+	char	*mergd_txt;
+	int		read_chrs;
+	int		i;
 
-    i = 0;
-    while (i < BUFFER_SIZE + 1)
-        temp_storage[i++] = '\0';
-    read_chars = read(fd, temp_storage, BUFFER_SIZE);
-    if (read_chars <= 0)
-    {
-        if (read_chars == -1)
-        {
-            if (*buffered_text)
-            {
-                free(*buffered_text);
-                *buffered_text = NULL;
-            }
-        }
-        return read_chars;
-    }
-    merged_text = ft_strjoin_and_free(*buffered_text, temp_storage);
-    if (!merged_text)
-        return (-1);
-    *buffered_text = merged_text;
-    return read_chars;
+	i = 0;
+	while (i < BUFFER_SIZE + 1)
+		tmp_stor[i++] = '\0';
+	read_chrs = read(fd, tmp_stor, BUFFER_SIZE);
+	if (read_chrs <= 0)
+	{
+		if (read_chrs == -1)
+		{
+			if (*buff_txt)
+			{
+				free(*buff_txt);
+				*buff_txt = NULL;
+			}
+		}
+		return (read_chrs);
+	}
+	mergd_txt = ft_strjoin_and_free(*buff_txt, tmp_stor);
+	if (!mergd_txt)
+		return (-1);
+	*buff_txt = mergd_txt;
+	return (read_chrs);
 }
 
-// Extracts the next line from buffered text.
-static void extract_line(char **line, char **buffered_text)
+static void	extract_l(char **l, char **buff_txt)
 {
-    char *newline_ptr;
-    int line_length;
+	char	*nl_ptr;
+	int		line_len;
 
-    newline_ptr = ft_strchr(*buffered_text, '\n');
-    if (newline_ptr != NULL)
-    {
-        line_length = newline_ptr - *buffered_text + 1;
-    }
-    else
-    {
-        line_length = ft_strlen(*buffered_text);
-    }
-    if (*line != NULL)
-    {
-        free(*line);
-    }
-    *line = ft_substr(*buffered_text, 0, line_length);
+	nl_ptr = ft_strchr(*buff_txt, '\n');
+	if (nl_ptr != NULL)
+	{
+		line_len = nl_ptr - *buff_txt + 1;
+	}
+	else
+	{
+		line_len = ft_strlen(*buff_txt);
+	}
+	if (*l != NULL)
+	{
+		free(*l);
+	}
+	*l = ft_substr(*buff_txt, 0, line_len);
 }
 
-// Resets buffer for the next read.
-static void reset_buffer(char **buffered_text)
+static void	res_buff(char **buff_txt)
 {
-    char *new_buffer;
-    char *newline_ptr;
+	char	*n_buff;
+	char	*nl_ptr;
 
-    newline_ptr = ft_strchr(*buffered_text, '\n');
-    if (newline_ptr)
-    {
-        new_buffer = ft_strdup(newline_ptr + 1);
-        free(*buffered_text);
-        *buffered_text = new_buffer;
-    }
-    else
-    {
-        free(*buffered_text);
-        *buffered_text = NULL;
-    }
+	nl_ptr = ft_strchr(*buff_txt, '\n');
+	if (nl_ptr)
+	{
+		n_buff = ft_strdup(nl_ptr + 1);
+		free(*buff_txt);
+		*buff_txt = n_buff;
+	}
+	else
+	{
+		free(*buff_txt);
+		*buff_txt = NULL;
+	}
 }
 
-char *process_line(char **buffered_text, char *line)
+char	*process_line(char **buff_txt, char *line)
 {
-    if (*buffered_text && **buffered_text)
-    {
-        extract_line(&line, buffered_text);
-        reset_buffer(buffered_text);
-    }
-    else
-    {
-        free(*buffered_text);
-        *buffered_text = NULL;
-    }
-    return line;
+	if (*buff_txt && **buff_txt)
+	{
+		extract_l(&line, buff_txt);
+		res_buff(buff_txt);
+	}
+	else
+	{
+		free(*buff_txt);
+		*buff_txt = NULL;
+	}
+	return (line);
 }
 
-// Main function to get the next line from file descriptor.
-char *get_next_line(int fd)
+char	*get_next_line(int fd)
 {
-    static char *buffered_text = NULL;
-    char *temp_storage;
-    char *line;
-    int read_status;
+	static char	*buff_txt = NULL;
+	char		*tmp_stor;
+	char		*line;
+	int			read_status;
 
-    line = NULL;
-    if (fd < 0 || BUFFER_SIZE <= 0)
-        return NULL;
-    if (!buffered_text)
-        buffered_text = ft_strdup("");
-    temp_storage = malloc((BUFFER_SIZE + 1) * sizeof(char));
-    if (!temp_storage)
-        return NULL;
-    while (!ft_strchr(buffered_text, '\n'))
-    {
-        read_status = buffer_data(fd, &buffered_text, temp_storage);
-        if (read_status <= 0) break;
-    }
-    free(temp_storage);
-    return process_line(&buffered_text, line);
+	line = NULL;
+	if (fd < 0 || BUFFER_SIZE <= 0)
+		return (NULL);
+	if (!buff_txt)
+		buff_txt = ft_strdup("");
+	tmp_stor = malloc((BUFFER_SIZE + 1) * sizeof(char));
+	if (!tmp_stor)
+		return (NULL);
+	while (!ft_strchr(buff_txt, '\n'))
+	{
+		read_status = buffer_data(fd, &buff_txt, tmp_stor);
+		if (read_status <= 0) 
+			break ;
+	}
+	free(tmp_stor);
+	return (process_line(&buff_txt, line));
 }
