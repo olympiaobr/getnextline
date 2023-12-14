@@ -12,6 +12,10 @@
 
 #include "get_next_line.h"
 
+/* Reads data from a file descriptor into a temporary storage buffer,
+then merges this new data with any previously buffered text.
+In case of read errors or reaching end-of-file,
+it cleans up and updates buffered_text.*/
 static int	buffer_data(int fd, char **buff_txt, char *tmp_stor)
 {
 	char	*mergd_txt;
@@ -41,6 +45,10 @@ static int	buffer_data(int fd, char **buff_txt, char *tmp_stor)
 	return (read_chrs);
 }
 
+/*Extracts next line from the buffered text,
+then finds the newline character (if present) and calculates the len of the line.
+then line gets extracted using substring
+operation and any previously allocated line is freed first.*/
 static void	extract_l(char **l, char **buff_txt)
 {
 	char	*nl_ptr;
@@ -62,6 +70,10 @@ static void	extract_l(char **l, char **buff_txt)
 	*l = ft_substr(*buff_txt, 0, line_len);
 }
 
+/*Resets the buffered text after a line is extracted;
+finds the position of the newline character + creates new buff
+starting from the character after the newline. old buff gets freed.
+*/
 static void	res_buff(char **buff_txt)
 {
 	char	*n_buff;
@@ -81,6 +93,11 @@ static void	res_buff(char **buff_txt)
 	}
 }
 
+/*processes the buff text; if there's text in the buffer,
+extract_l called to get the next line,
+then calls res_buff to reset the buffer;
+otherwise, it frees the buffer.
+*/
 char	*process_line(char **buff_txt, char *line)
 {
 	if (*buff_txt && **buff_txt)
@@ -96,6 +113,10 @@ char	*process_line(char **buff_txt, char *line)
 	return (line);
 }
 
+/*main function to read the next line from a fd,
+handles initial buffer setup, reads data using buffer_data,
+and processes the buffered text to extract the next line.
+*/
 char	*get_next_line(int fd)
 {
 	static char	*buff_txt = NULL;
@@ -114,7 +135,7 @@ char	*get_next_line(int fd)
 	while (!ft_strchr(buff_txt, '\n'))
 	{
 		read_status = buffer_data(fd, &buff_txt, tmp_stor);
-		if (read_status <= 0) 
+		if (read_status <= 0)
 			break ;
 	}
 	free(tmp_stor);
