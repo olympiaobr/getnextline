@@ -1,3 +1,15 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   get_next_line_bonus.c                              :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: olobresh <olobresh@student.42berlin.d      +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2023/12/18 10:38:29 by olobresh          #+#    #+#             */
+/*   Updated: 2023/12/18 10:38:31 by olobresh         ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 #include "get_next_line_bonus.h"
 
 /* Reads data from a file descriptor into a temporary storage buffer,
@@ -128,5 +140,5 @@ char	*get_next_line(int fd)
 	}
 	free(tmp_stor);
 	line = process_line(&buff_txt[fd], NULL);
-    return (line);
+	return (line);
 }

@@ -113,7 +113,7 @@ char	*process_line(char **buff_txt, char *line)
 	return (line);
 }
 
-/*main function to read the next line from a fd,
+/*reads the next line from a fd,
 handles initial buffer setup, reads data using buffer_data,
 and processes the buffered text to extract the next line.
 */
